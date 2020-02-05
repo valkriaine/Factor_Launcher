@@ -1,0 +1,5 @@
+<resources>
+    <string name="title_activity_tabs">tabs</string>
+    <string name="tab_text_1">Home</string>
+    <string name="tab_text_2">Apps</string>
+</resources>

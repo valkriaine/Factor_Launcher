@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.valkriaine.glasslauncher">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.BIND_APPWIDGET" tools:ignore="ProtectedPermissions" />
+
+    <application
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="HomeLauncher"
+            android:largeHeap="false"
+            android:hardwareAccelerated="true"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:stateNotNeeded="true"
+            android:supportsRtl="true"
+            android:theme="@style/HomeTheme"
+            android:restoreAnyVersion="true"
+            android:installLocation="internalOnly">
+        <activity
+                android:name=".HomeScreen"
+                android:launchMode="singleTask"
+                android:clearTaskOnLaunch="true"
+                android:stateNotNeeded="true"
+                android:screenOrientation="portrait"
+                android:theme="@style/HomeTheme"
+                android:enabled="true"
+                android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.HOME"/>
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

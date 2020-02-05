@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      android:fitsSystemWindows="true">
+    <item android:id="@+id/removeFromStart" android:title="Remove from Start"/>
+    <item android:id="@+id/info" android:title="Info"/>
+    <item android:id="@+id/uninstall" android:title="Uninstall"/>
+</menu>
