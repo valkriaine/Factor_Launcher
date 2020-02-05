@@ -12,12 +12,14 @@ import android.widget.*
 import android.widget.AdapterView.AdapterContextMenuInfo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
+import com.google.gson.Gson
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.ScaleInBottomAnimator
 import kotlinx.android.synthetic.main.activity_home_screen.*
@@ -95,45 +97,10 @@ class HomeScreen : AppCompatActivity() {
         setContentView(R.layout.activity_home_screen)
 
         sharedPreferences = getSharedPreferences(key, Context.MODE_PRIVATE)
-        viewModel = ViewModel(this, packageManager)
+        viewModel = ViewModel(this, packageManager, sharedPreferences)
 
 
-        registerReceiver(object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                when(intent.action) {
-                    Intent.ACTION_PACKAGE_ADDED -> {
-                        val appAdded = context.packageManager.getApplicationInfo(intent.dataString!!.substring(8), 0)
-                        val appIntentAdded = context.packageManager.getLaunchIntentForPackage(appAdded.packageName)
-                        if(appIntentAdded != null && appAdded.packageName != BuildConfig.APPLICATION_ID) {
-                            viewModel.allApps.apply {
-                                add(AppInfo(
-                                    appAdded.loadLabel(context.packageManager).toString(),
-                                    appAdded.loadIcon(context.packageManager),
-                                    appAdded.packageName
-                                ))
-                                sort()
-                            }
-                        }
-                        viewModel.notifyAppListDataChange()
-                    }
 
-                    Intent.ACTION_PACKAGE_REMOVED -> {
-                        viewModel.allApps.removeByPackage(
-                            intent.dataString!!.substring(8)
-                        )
-                        viewModel.tiles.removeByPackageName(
-                            intent.dataString!!.substring(8)
-                        )
-                        viewModel.notifyAppListDataChange()
-                    }
-                }
-            }
-        }.also { broadcastReceiver = it }, IntentFilter().apply {
-                addAction(Intent.ACTION_PACKAGE_ADDED)
-                addAction(Intent.ACTION_PACKAGE_REMOVED)
-                addDataScheme("package")
-            }
-        )
 
         widgetManager = AppWidgetManager.getInstance(this)
 
@@ -149,8 +116,49 @@ class HomeScreen : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(tileList)
         tileList.itemAnimator = ScaleInBottomAnimator()
 
+        //registerBroadcast()
 
 
+
+    }
+    fun registerBroadcast ()
+    {
+        registerReceiver(object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                when(intent.action) {
+                    Intent.ACTION_PACKAGE_ADDED -> {
+                        val appAdded = context.packageManager.getApplicationInfo(intent.dataString!!.substring(8), 0)
+                        val appIntentAdded = context.packageManager.getLaunchIntentForPackage(appAdded.packageName)
+                        if(appIntentAdded != null && appAdded.packageName != BuildConfig.APPLICATION_ID) {
+                            viewModel.apps.apply {
+                                add(AppInfo(
+                                    appAdded.loadLabel(context.packageManager).toString(),
+                                    appAdded.loadIcon(context.packageManager).toBitmap(),
+                                    appAdded.packageName
+                                ))
+                                sort()
+                            }
+                        }
+                        viewModel.notifyAppListDataChange()
+                    }
+
+                    Intent.ACTION_PACKAGE_REMOVED -> {
+                        viewModel.apps.removeByPackage(
+                            intent.dataString!!.substring(8)
+                        )
+                        viewModel.tiles.removeByPackageName(
+                            intent.dataString!!.substring(8)
+                        )
+                        viewModel.notifyAppListDataChange()
+                    }
+                }
+            }
+        }.also { broadcastReceiver = it }, IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addAction(Intent.ACTION_PACKAGE_REMOVED)
+            addDataScheme("package")
+        }
+        )
     }
     fun ArrayList<AppInfo>.removeByPackage(packageName : String)
     {
@@ -172,12 +180,14 @@ class HomeScreen : AppCompatActivity() {
     {
         super.onPause()
         blurry.disable()
+        //unregisterReceiver(broadcastReceiver)
     }
     override fun onResume()
     {
         super.onResume()
         blurry.enable()
         blurry.updateForMilliSeconds(timeUnit)
+        //registerBroadcast()
     }
     override fun onBackPressed()
     {
@@ -191,7 +201,7 @@ class HomeScreen : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
     }
-    fun switchpage()
+    fun switchpage(view: View)
     {
         pager.setCurrentItem(1, true)
     }
@@ -254,7 +264,14 @@ class HomeScreen : AppCompatActivity() {
     {
         appGrid.adapter = viewModel.appsAdapter
         appGrid.setOnItemClickListener{ _, _, position, _ ->
-            startActivity(viewModel.launchApp(position))
+            try {
+                startActivity(viewModel.launchApp(position))
+            }
+            catch (e : java.lang.Exception)
+            {
+
+            }
+
         }
         registerForContextMenu(appGrid)
         appGrid.setOnCreateContextMenuListener { menu, v, menuInfo ->
@@ -262,7 +279,7 @@ class HomeScreen : AppCompatActivity() {
             val info = menuInfo as AdapterContextMenuInfo
             val pos = info.position
 
-            if (!viewModel.checkIfTileExists(viewModel.allApps[pos]))
+            if (!viewModel.checkIfTileExists(viewModel.apps[pos]))
             menuInflater.inflate(R.menu.applist_menu_add, menu)
             else
                 menuInflater.inflate(R.menu.applist_menu_remove, menu)
@@ -272,7 +289,6 @@ class HomeScreen : AppCompatActivity() {
     private fun setUpTileList()
     {
         tileList.adapter = ScaleInAnimationAdapter(viewModel.recyclerViewAdapter). apply{
-            // Change the durations.
             setDuration(350)
             setFirstOnly(true)
         }
@@ -296,7 +312,7 @@ class HomeScreen : AppCompatActivity() {
             }
             R.id.uninstall ->
             {
-                //launcher uninstall intent
+               startActivity(viewModel.uninstallApp(pos))
             }
             R.id.info ->
             {
