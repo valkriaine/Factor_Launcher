@@ -8,8 +8,11 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.*
-import android.widget.*
 import android.widget.AdapterView.AdapterContextMenuInfo
+import android.widget.GridLayout
+import android.widget.GridView
+import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.toBitmap
@@ -19,13 +22,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
-import com.google.gson.Gson
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.ScaleInBottomAnimator
 import kotlinx.android.synthetic.main.activity_home_screen.*
 import no.danielzeller.blurbehindlib.BlurBehindLayout
 import no.danielzeller.blurbehindlib.UpdateMode
-
 
 
 enum class SwipeDirection
