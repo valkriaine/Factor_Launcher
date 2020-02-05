@@ -25,6 +25,14 @@ import no.danielzeller.blurbehindlib.BlurBehindLayout
 import no.danielzeller.blurbehindlib.UpdateMode
 
 
+
+enum class SwipeDirection
+{
+    All, Left, Right, None
+}
+
+
+
 class HomeScreen : AppCompatActivity() {
 
 
@@ -328,10 +336,7 @@ class HomeScreen : AppCompatActivity() {
     }
 
 }
-enum class SwipeDirection
-{
-    All, Left, Right, None
-}
+
 class HomePager(context: Context?, attrs: AttributeSet?) : ViewPager(context!!, attrs)
 {
     private var initialXValue = 0f
