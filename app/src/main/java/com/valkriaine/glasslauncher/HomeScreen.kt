@@ -9,23 +9,18 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView.AdapterContextMenuInfo
-import android.widget.GridLayout
-import android.widget.GridView
-import android.widget.ImageButton
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.toBitmap
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
+import com.valkriaine.glasslauncher.databinding.ActivityHomeScreenBinding
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.ScaleInBottomAnimator
-import kotlinx.android.synthetic.main.activity_home_screen.*
-import no.danielzeller.blurbehindlib.BlurBehindLayout
 import no.danielzeller.blurbehindlib.UpdateMode
 
 
@@ -43,13 +38,7 @@ class HomeScreen : AppCompatActivity() {
     private val timeUnit : Long = 0.000001.toLong()
     private var xOffset : Float = 0f
     private lateinit var wm : WallpaperManager
-    lateinit var pager : HomePager
     lateinit var pagerAdapter: SectionsPagerAdapter
-    private lateinit var blurry : BlurBehindLayout
-    private lateinit var dim : GridLayout
-    private lateinit var appGrid : GridView
-    lateinit var arrowButton : ImageButton
-    lateinit var blurFrame : ConstraintLayout
     private lateinit var widgetManager: AppWidgetManager
     private lateinit var broadcastReceiver: BroadcastReceiver
     private lateinit var sharedPreferences: SharedPreferences
@@ -91,15 +80,13 @@ class HomeScreen : AppCompatActivity() {
 
     companion object
     {
-        lateinit var background : ImageView
-        lateinit var tileList : RecyclerView
-        lateinit var blur : ConstraintLayout
         lateinit var viewModel : ViewModel
+        lateinit var binding : ActivityHomeScreenBinding
     }
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_screen)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_home_screen)
 
         sharedPreferences = getSharedPreferences(key, Context.MODE_PRIVATE)
         widgetManager = AppWidgetManager.getInstance(this)
@@ -110,17 +97,13 @@ class HomeScreen : AppCompatActivity() {
         setUpAppList()
         setUpTileList()
         hideNavigationBar()
-
-
-        //itemTouchHelper.attachToRecyclerView(null)
-        itemTouchHelper.attachToRecyclerView(tileList)
-        tileList.itemAnimator = ScaleInBottomAnimator()
-
         registerBroadcast()
 
 
 
     }
+
+    //todo: handle app update
     private fun registerBroadcast ()
     {
         registerReceiver(object : BroadcastReceiver() {
@@ -179,20 +162,20 @@ class HomeScreen : AppCompatActivity() {
     override fun onPause()
     {
         super.onPause()
-        blurry.disable()
+        binding.backgroundBlur.disable()
         unregisterReceiver(broadcastReceiver)
     }
     override fun onResume()
     {
         super.onResume()
-        blurry.enable()
-        blurry.updateForMilliSeconds(timeUnit)
+        binding.backgroundBlur.enable()
+        binding.backgroundBlur.updateForMilliSeconds(timeUnit)
         registerBroadcast()
     }
     override fun onBackPressed()
     {
-        if (pager.currentItem == 1)
-            pager.setCurrentItem(0, true)
+        if (binding.viewPager.currentItem == 1)
+            binding.viewPager.setCurrentItem(0, true)
     }
     private fun hideNavigationBar()
     {
@@ -203,96 +186,100 @@ class HomeScreen : AppCompatActivity() {
     }
     fun switchpage(view: View)
     {
-        pager.setCurrentItem(1, true)
+        binding.viewPager.setCurrentItem(1, true)
     }
     private fun linkComponents()
     {
         this.wm = WallpaperManager.getInstance(applicationContext)
-        dim = findViewById(R.id.dim)
-        background = findViewById(R.id.image)
-        background.setImageDrawable(wm.drawable)
-        appGrid = list
-        arrowButton = arrowbutton
-        tileList = tilelist
-        blurFrame = blurframe
-        dim.alpha = 0f
-        blurry = backgroundblur
-        blurry.viewBehind = background
-        blur = blurback
-
+        binding.apply {
+            image.setImageDrawable(wm.drawable)
+            dim.alpha = 0f
+            backgroundBlur.viewBehind = binding.image
+        }
     }
     private fun setUpPager()
     {
         pagerAdapter = SectionsPagerAdapter()
-        pager = view_pager
-        pager.adapter = pagerAdapter
-        pager.setAllowedSwipeDirection(SwipeDirection.Right)
-        pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        binding.apply {
+            viewPager.adapter = pagerAdapter
+            viewPager.setAllowedSwipeDirection(SwipeDirection.Right)
+            viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
 
-            override fun onPageScrollStateChanged(state: Int) {
-                if (pager.currentItem == 0) {
-                    blurFrame.translationZ = -200f
-                    blurry.disable()
+                override fun onPageScrollStateChanged(state: Int) {
+                    if (binding.viewPager.currentItem == 0) {
+                        binding.blurFrame.translationZ = -200f
+                        binding.backgroundBlur.disable()
+                    }
+                    if (binding.viewPager.currentItem == 1) {
+                        binding.backgroundBlur.updateMode = UpdateMode.MANUALLY
+                    }
                 }
-                if (pager.currentItem == 1) {
-                    blurry.updateMode = UpdateMode.MANUALLY
+
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                    xOffset = (position + positionOffset) / (pagerAdapter.count - 1)
+                    binding.backgroundBlur.enable()
+                    binding.backgroundBlur.updateMode = UpdateMode.ON_SCROLL
+                    binding.dim.alpha = xOffset/1.5f
+                    binding.backgroundBlur.blurRadius = xOffset * 50
+                    arrowButton.rotation = 180 + 180*xOffset
+
                 }
-            }
 
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                xOffset = (position + positionOffset) / (pagerAdapter.count - 1)
-                blurry.enable()
-                blurry.updateMode = UpdateMode.ON_SCROLL
-                dim.alpha = xOffset/1.5f
-                blurry.blurRadius = xOffset * 50
-                arrowButton.rotation = 180 + 180*xOffset
-
-            }
-
-            override fun onPageSelected(position: Int) {
-                if (position == 0) {
-                    pager.setAllowedSwipeDirection(SwipeDirection.Right)
-                    arrowButton.rotation = 180f
-                } else {
-                    pager.setAllowedSwipeDirection(SwipeDirection.Left)
-                    arrowButton.rotation = 0f
+                override fun onPageSelected(position: Int) {
+                    if (position == 0) {
+                        binding.viewPager.setAllowedSwipeDirection(SwipeDirection.Right)
+                        arrowButton.rotation = 180f
+                    } else {
+                        binding.viewPager.setAllowedSwipeDirection(SwipeDirection.Left)
+                        arrowButton.rotation = 0f
+                    }
                 }
-            }
-        })
+            })
+        }
+
     }
     private fun setUpAppList()
     {
-        appGrid.adapter = viewModel.appsAdapter
-        appGrid.setOnItemClickListener{ _, _, position, _ ->
-            try {
-                startActivity(viewModel.launchApp(position))
-            }
-            catch (e : java.lang.Exception)
-            {
+        binding.apply {
+            list.adapter = viewModel.appsAdapter
+            list.setOnItemClickListener{ _, _, position, _ ->
+                try {
+                    startActivity(viewModel.launchApp(position))
+                }
+                catch (e : java.lang.Exception)
+                {
+
+                }
 
             }
+            registerForContextMenu(list)
+            list.setOnCreateContextMenuListener { menu, v, menuInfo ->
+                super.onCreateContextMenu(menu, v, menuInfo)
+                val info = menuInfo as AdapterContextMenuInfo
+                val pos = info.position
 
-        }
-        registerForContextMenu(appGrid)
-        appGrid.setOnCreateContextMenuListener { menu, v, menuInfo ->
-            super.onCreateContextMenu(menu, v, menuInfo)
-            val info = menuInfo as AdapterContextMenuInfo
-            val pos = info.position
+                if (!viewModel.checkIfTileExists(viewModel.apps[pos]))
+                    menuInflater.inflate(R.menu.applist_menu_add, menu)
+                else
+                    menuInflater.inflate(R.menu.applist_menu_remove, menu)
 
-            if (!viewModel.checkIfTileExists(viewModel.apps[pos]))
-            menuInflater.inflate(R.menu.applist_menu_add, menu)
-            else
-                menuInflater.inflate(R.menu.applist_menu_remove, menu)
-
+            }
         }
     }
     private fun setUpTileList()
     {
-        tileList.adapter = ScaleInAnimationAdapter(viewModel.recyclerViewAdapter). apply{
-            setDuration(350)
-            setFirstOnly(true)
+        binding.apply {
+            tileList.adapter = ScaleInAnimationAdapter(viewModel.recyclerViewAdapter). apply{
+                setDuration(350)
+                setFirstOnly(true)
+            }
+            registerForContextMenu(tileList)
+
+            itemTouchHelper.attachToRecyclerView(tileList)
+            tileList.itemAnimator = ScaleInBottomAnimator()
         }
-        tileList.layoutManager = ChipsLayoutManager.newBuilder(this)
+
+        binding.tileList.layoutManager = ChipsLayoutManager.newBuilder(this)
             .setOrientation(ChipsLayoutManager.HORIZONTAL)
             .setChildGravity(Gravity.CENTER)
             .setRowStrategy(ChipsLayoutManager.STRATEGY_DEFAULT)
@@ -300,12 +287,11 @@ class HomeScreen : AppCompatActivity() {
             .setScrollingEnabled(true)
             .build()
 
-        registerForContextMenu(tileList)
-
-
         viewModel.recyclerViewAdapter.onItemClick = { liveTile -> startActivity(packageManager.getLaunchIntentForPackage(liveTile.name!!)) }
         viewModel.recyclerViewAdapter.onItemLongClick = {
         }
+
+
     }
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val info = item.menuInfo as AdapterContextMenuInfo
@@ -314,7 +300,8 @@ class HomeScreen : AppCompatActivity() {
         {
             R.id.addToStart ->
             {
-                pager.setCurrentItem(0, true)
+                binding.viewPager.setCurrentItem(0, true)
+                binding.tileList.scrollToPosition(viewModel.tiles.size - 1)
                 viewModel.addToTiles(pos)
             }
             R.id.uninstall ->
@@ -338,7 +325,7 @@ class HomeScreen : AppCompatActivity() {
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             var resId = 0
             when (position) {
-                0 -> resId = R.id.livetilehost
+                0 -> resId = R.id.liveTileHost
                 1 -> resId = R.id.appdrawer
             }
             return container.findViewById(resId)

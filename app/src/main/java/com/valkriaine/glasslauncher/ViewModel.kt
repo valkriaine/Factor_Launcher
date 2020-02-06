@@ -198,7 +198,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
 
                 when (liveTile.size) {
                     0 -> {
-                        outer.minWidth = HomeScreen.tileList.width / 2
+                        outer.minWidth = HomeScreen.binding.tileList.width / 2
                         outer.maxWidth = outer.minWidth
                         outer.maxHeight = outer.minWidth
                         outer.minHeight = outer.maxHeight
@@ -208,7 +208,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                         inner.maxWidth = inner.minWidth
                     }
                     1 -> {
-                        outer.minWidth = HomeScreen.tileList.width
+                        outer.minWidth = HomeScreen.binding.tileList.width
                         outer.maxWidth = outer.minWidth
                         outer.maxHeight = outer.minWidth/2
                         outer.minHeight = outer.maxHeight
@@ -218,7 +218,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                         inner.maxWidth = inner.minWidth
                     }
                     2 -> {
-                        outer.minWidth = HomeScreen.tileList.width
+                        outer.minWidth = HomeScreen.binding.tileList.width
                         outer.maxWidth = outer.minWidth
                         outer.maxHeight = outer.minWidth
                         outer.minHeight = outer.maxHeight
@@ -228,7 +228,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                         inner.maxWidth = inner.minWidth
                     }
                 }
-                blur.setupWith(HomeScreen.blur)
+                blur.setupWith(HomeScreen.binding.blurback)
                     .setBlurAlgorithm(RenderScriptBlur(context))
                     .setBlurRadius(18F)
                     .setHasFixedTransformationMatrix(false)
