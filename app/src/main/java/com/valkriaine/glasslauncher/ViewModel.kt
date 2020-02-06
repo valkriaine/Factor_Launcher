@@ -29,7 +29,7 @@ import java.io.ByteArrayOutputStream
 
 
 enum class TileType{
-    NORMAL, WIDGET, GALLERY
+    NORMAL, WIDGET, GALLERY, FOLDER
 }
 
 class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
@@ -51,6 +51,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
     private val tilesLoader = LoadTiles()
     private val appsLoader = LoadApps()
     private lateinit var tilesSaver : SaveTiles
+    //todo: save changes to appList in the background
     private lateinit var appsSaver : SaveApps
 
     init {
@@ -136,7 +137,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                 itemView.setOnClickListener {
                     onItemClick?.invoke(tiles[adapterPosition])
                 }
-                itemView.setOnLongClickListener(){
+                itemView.setOnLongClickListener {
                     onItemLongClick?.invoke(tiles[adapterPosition])
                     itemView.isLongClickable
                 }
@@ -228,7 +229,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                         inner.maxWidth = inner.minWidth
                     }
                 }
-                blur.setupWith(HomeScreen.binding.blurback)
+                blur.setupWith(HomeScreen.binding.blurBackground)
                     .setBlurAlgorithm(RenderScriptBlur(context))
                     .setBlurRadius(18F)
                     .setHasFixedTransformationMatrix(false)
@@ -303,7 +304,6 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
         }
 
     }
-
     @SuppressLint("StaticFieldLeak")
     inner class LoadTiles : AsyncTask<String, Int, Int>()
     {

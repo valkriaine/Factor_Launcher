@@ -114,27 +114,22 @@ class HomeScreen : AppCompatActivity() {
                         val appIntentAdded = context.packageManager.getLaunchIntentForPackage(appAdded.packageName)
                         if(appIntentAdded != null && appAdded.packageName != BuildConfig.APPLICATION_ID) {
                             viewModel.apps.apply {
-                                add(AppInfo(
-                                    appAdded.loadLabel(context.packageManager).toString(),
-                                    appAdded.loadIcon(context.packageManager).toBitmap(),
-                                    appAdded.packageName
-                                ))
+                                add(AppInfo(appAdded.loadLabel(context.packageManager).toString(), appAdded.loadIcon(context.packageManager).toBitmap(), appAdded.packageName))
                                 sort()
                             }
                         }
                         viewModel.notifyAppListDataChange()
                     }
-
                     Intent.ACTION_PACKAGE_REMOVED -> {
-                        viewModel.apps.removeByPackage(
-                            intent.dataString!!.substring(8)
-                        )
-                        viewModel.tiles.removeByPackageName(
-                            intent.dataString!!.substring(8)
-                        )
+                        if (!intent.extras?.getBoolean(Intent.EXTRA_REPLACING)!!)
+                        viewModel.apps.removeByPackage(intent.dataString!!.substring(8))
+                        viewModel.tiles.removeByPackageName(intent.dataString!!.substring(8))
                         viewModel.notifyAppListDataChange()
                     }
+
                 }
+
+
             }
         }.also { broadcastReceiver = it }, IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)

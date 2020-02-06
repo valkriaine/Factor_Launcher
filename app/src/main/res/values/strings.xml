@@ -2,4 +2,6 @@
     <string name="title_activity_tabs">tabs</string>
     <string name="tab_text_1">Home</string>
     <string name="tab_text_2">Apps</string>
+    <string name="go_to_app_drawer">Go to app drawer</string>
+    <string name="background_image">Background image</string>
 </resources>
