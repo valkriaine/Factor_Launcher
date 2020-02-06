@@ -126,6 +126,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:paddingTop="120dp"
+                        android:paddingBottom="200dp"
                         android:clipToPadding="false"
                         app:elastic_elasticScrollView="true"
                 />
