@@ -12,12 +12,11 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.util.Base64
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
@@ -121,17 +120,89 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
 
     inner class RecyclerViewAdapter (private val context: Context) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>()
     {
+        var onItemClick: ((LiveTile) -> Unit)? = null
+        var onItemLongClick : ((LiveTile) -> Unit)? = null
+
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         {
+            private var size = 1
             private val icon : ImageView = itemView.findViewById(R.id.tileicon)
             private val label: TextView = itemView.findViewById(R.id.tilelabel)
             private val inner : ConstraintLayout = itemView.findViewById(R.id.inner)
             private val outer : ConstraintLayout = itemView.findViewById(R.id.tilelayout)
             private val blur : BlurView = itemView.findViewById(R.id.trans)
 
+            init {
+                itemView.setOnClickListener(){
+                    onItemClick?.invoke(tiles[adapterPosition])
+                }
+                itemView.setOnLongClickListener(){
+                    onItemLongClick?.invoke(tiles[adapterPosition])
+                    itemView.isLongClickable
+                }
+
+                itemView.setOnLongClickListener{
+                    val popup = PopupMenu(context, itemView)
+                    popup.inflate(R.menu.tilelist_menu)
+                    popup.menu.add("Remove from Start")
+                    popup.menu.add("Edit")
+                    if (size == 0)
+                    {
+                        popup.menu.add("Make wide")
+                        popup.menu.add("Make large")
+                    }
+                    else if (size == 1)
+                    {
+                        popup.menu.add("Make small")
+                        popup.menu.add("Make large")
+                    }
+                    else
+                    {
+                        popup.menu.add("Make small")
+                        popup.menu.add("Make wide")
+                    }
+                    popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
+                        override fun onMenuItemClick(item: MenuItem): Boolean
+                        {
+                            if (item.title == "Remove from Start")
+                            {
+                                recyclerViewAdapter.remove(tiles[adapterPosition])
+                            }
+                            if (item.title == "Edit")
+                            {
+                                //todo: edit mode
+                            }
+                            if (item.title == "Make wide")
+                            {
+                                tiles[adapterPosition].size = 1
+                                recyclerViewAdapter.notifyItemChanged(adapterPosition)
+                            }
+                            if (item.title == "Make large")
+                            {
+                                tiles[adapterPosition].size = 2
+                                recyclerViewAdapter.notifyItemChanged(adapterPosition)
+                            }
+                            if (item.title == "Make small")
+                            {
+                                tiles[adapterPosition].size = 0
+                                recyclerViewAdapter.notifyItemChanged(adapterPosition)
+                            }
+
+                            tilesSaver = SaveTiles()
+                            tilesSaver.execute()
+                            return true
+                        }
+                    })
+                    popup.show()
+                    true
+                }
+
+            }
+
             fun bindItem(liveTile: LiveTile?)
             {
-                icon.setImageBitmap(getBitmapFromString(liveTile?.icon!!))
+                size = liveTile!!.size
+                icon.setImageBitmap(getBitmapFromString(liveTile.icon!!))
                 label.text = liveTile.rename
 
                 when (liveTile.size) {
@@ -171,6 +242,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                     .setBlurRadius(18F)
                     .setHasFixedTransformationMatrix(false)
             }
+
         }
         fun moveItem(from: Int, to: Int)
         {
@@ -200,7 +272,9 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
         //more on this, add widget type
         override fun getItemViewType(position: Int): Int = tiles[position].size
         override fun getItemCount(): Int = tiles.size
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bindItem((tiles[position]))
+        override fun onBindViewHolder(holder: ViewHolder, position: Int){
+            holder.bindItem((tiles[position]))
+        }
     }
     inner class AppsAdapter internal constructor(context: Context, private val resource: Int) : ArrayAdapter<AppsAdapter.ItemHolder>(context, resource)
     {

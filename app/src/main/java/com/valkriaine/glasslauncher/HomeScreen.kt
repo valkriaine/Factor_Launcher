@@ -54,7 +54,7 @@ class HomeScreen : AppCompatActivity() {
     private lateinit var broadcastReceiver: BroadcastReceiver
     private lateinit var sharedPreferences: SharedPreferences
     private val itemTouchHelper by lazy{
-        val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
+        val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 2) {
 
             override fun onMove(recyclerView: RecyclerView,
                                 viewHolder: RecyclerView.ViewHolder,
@@ -62,6 +62,10 @@ class HomeScreen : AppCompatActivity() {
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
                 viewModel.moveTile(from, to)
+                return true
+            }
+
+            override fun isItemViewSwipeEnabled(): Boolean {
                 return true
             }
 
@@ -98,14 +102,8 @@ class HomeScreen : AppCompatActivity() {
         setContentView(R.layout.activity_home_screen)
 
         sharedPreferences = getSharedPreferences(key, Context.MODE_PRIVATE)
-        viewModel = ViewModel(this, packageManager, sharedPreferences)
-
-
-
-
         widgetManager = AppWidgetManager.getInstance(this)
-
-
+        viewModel = ViewModel(this, packageManager, sharedPreferences)
 
         linkComponents()
         setUpPager()
@@ -114,15 +112,16 @@ class HomeScreen : AppCompatActivity() {
         hideNavigationBar()
 
 
+        //itemTouchHelper.attachToRecyclerView(null)
         itemTouchHelper.attachToRecyclerView(tileList)
         tileList.itemAnimator = ScaleInBottomAnimator()
 
-        //registerBroadcast()
+        registerBroadcast()
 
 
 
     }
-    fun registerBroadcast ()
+    private fun registerBroadcast ()
     {
         registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -181,14 +180,14 @@ class HomeScreen : AppCompatActivity() {
     {
         super.onPause()
         blurry.disable()
-        //unregisterReceiver(broadcastReceiver)
+        unregisterReceiver(broadcastReceiver)
     }
     override fun onResume()
     {
         super.onResume()
         blurry.enable()
         blurry.updateForMilliSeconds(timeUnit)
-        //registerBroadcast()
+        registerBroadcast()
     }
     override fun onBackPressed()
     {
@@ -300,6 +299,13 @@ class HomeScreen : AppCompatActivity() {
             .setMaxViewsInRow(2)
             .setScrollingEnabled(true)
             .build()
+
+        registerForContextMenu(tileList)
+
+
+        viewModel.recyclerViewAdapter.onItemClick = { liveTile -> startActivity(packageManager.getLaunchIntentForPackage(liveTile.name!!)) }
+        viewModel.recyclerViewAdapter.onItemLongClick = {
+        }
     }
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val info = item.menuInfo as AdapterContextMenuInfo
