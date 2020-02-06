@@ -133,7 +133,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
             private val blur : BlurView = itemView.findViewById(R.id.trans)
 
             init {
-                itemView.setOnClickListener(){
+                itemView.setOnClickListener {
                     onItemClick?.invoke(tiles[adapterPosition])
                 }
                 itemView.setOnLongClickListener(){
@@ -146,53 +146,44 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                     popup.inflate(R.menu.tilelist_menu)
                     popup.menu.add("Remove from Start")
                     popup.menu.add("Edit")
-                    if (size == 0)
-                    {
-                        popup.menu.add("Make wide")
-                        popup.menu.add("Make large")
-                    }
-                    else if (size == 1)
-                    {
-                        popup.menu.add("Make small")
-                        popup.menu.add("Make large")
-                    }
-                    else
-                    {
-                        popup.menu.add("Make small")
-                        popup.menu.add("Make wide")
-                    }
-                    popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
-                        override fun onMenuItemClick(item: MenuItem): Boolean
-                        {
-                            if (item.title == "Remove from Start")
-                            {
-                                recyclerViewAdapter.remove(tiles[adapterPosition])
-                            }
-                            if (item.title == "Edit")
-                            {
-                                //todo: edit mode
-                            }
-                            if (item.title == "Make wide")
-                            {
-                                tiles[adapterPosition].size = 1
-                                recyclerViewAdapter.notifyItemChanged(adapterPosition)
-                            }
-                            if (item.title == "Make large")
-                            {
-                                tiles[adapterPosition].size = 2
-                                recyclerViewAdapter.notifyItemChanged(adapterPosition)
-                            }
-                            if (item.title == "Make small")
-                            {
-                                tiles[adapterPosition].size = 0
-                                recyclerViewAdapter.notifyItemChanged(adapterPosition)
-                            }
-
-                            tilesSaver = SaveTiles()
-                            tilesSaver.execute()
-                            return true
+                    when (size) {
+                        0 -> {
+                            popup.menu.add("Make wide")
+                            popup.menu.add("Make large")
                         }
-                    })
+                        1 -> {
+                            popup.menu.add("Make small")
+                            popup.menu.add("Make large")
+                        }
+                        else -> {
+                            popup.menu.add("Make small")
+                            popup.menu.add("Make wide")
+                        }
+                    }
+                    popup.setOnMenuItemClickListener { item ->
+                        if (item.title == "Remove from Start") {
+                            recyclerViewAdapter.remove(tiles[adapterPosition])
+                        }
+                        if (item.title == "Edit") {
+                            //todo: edit mode
+                        }
+                        if (item.title == "Make wide") {
+                            tiles[adapterPosition].size = 1
+                            recyclerViewAdapter.notifyItemChanged(adapterPosition)
+                        }
+                        if (item.title == "Make large") {
+                            tiles[adapterPosition].size = 2
+                            recyclerViewAdapter.notifyItemChanged(adapterPosition)
+                        }
+                        if (item.title == "Make small") {
+                            tiles[adapterPosition].size = 0
+                            recyclerViewAdapter.notifyItemChanged(adapterPosition)
+                        }
+
+                        tilesSaver = SaveTiles()
+                        tilesSaver.execute()
+                        true
+                    }
                     popup.show()
                     true
                 }
