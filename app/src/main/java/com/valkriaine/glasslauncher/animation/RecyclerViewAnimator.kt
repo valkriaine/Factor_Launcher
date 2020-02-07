@@ -13,6 +13,21 @@ class RecyclerViewAnimator(private val mRecyclerView: RecyclerView) {
     private var mFirstViewInit = true
     private var mLastPosition = -1
     private var mStartDelay: Int
+
+    /**
+     * Initial delay before to show items - in ms
+     */
+    private val delay = 50
+    /**
+     * Initial entrance tension parameter.
+     * See https://facebook.github.io/rebound/
+     */
+    private val tension = 250
+    /**
+     * Initial entrance friction parameter.
+     */
+    private val friction = 25
+
     fun onCreateViewHolder(item: View) {
         /**
          * mFirstViewInit is used because we only want to show animation once at initialization.
@@ -21,11 +36,9 @@ class RecyclerViewAnimator(private val mRecyclerView: RecyclerView) {
         if (mFirstViewInit) {
             slideInBottom(
                 item,
-                mStartDelay,
-                INIT_TENSION,
-                INIT_FRICTION
+                mStartDelay
             )
-            mStartDelay += 70
+            this.mStartDelay += 70
         }
     }
 
@@ -36,9 +49,8 @@ class RecyclerViewAnimator(private val mRecyclerView: RecyclerView) {
         if (!mFirstViewInit && position > mLastPosition) {
             slideInBottom(
                 item,
-                0,
-                SCROLL_TENSION,
-                SCROLL_FRICTION
+                0
+
             )
             mLastPosition = position
         }
@@ -46,9 +58,7 @@ class RecyclerViewAnimator(private val mRecyclerView: RecyclerView) {
 
     private fun slideInBottom(
         item: View,
-        delay: Int,
-        tension: Int,
-        friction: Int
+        delay: Int
     ) { // Move item far outside the RecyclerView
         item.translationY = mHeight.toFloat()
         val startAnimation = Runnable {
@@ -83,33 +93,9 @@ class RecyclerViewAnimator(private val mRecyclerView: RecyclerView) {
         mRecyclerView.postDelayed(startAnimation, delay.toLong())
     }
 
-    companion object {
-        /**
-         * Initial delay before to show items - in ms
-         */
-        private const val INIT_DELAY = 100
-        /**
-         * Initial entrance tension parameter.
-         * See https://facebook.github.io/rebound/
-         */
-        private const val INIT_TENSION = 250
-        /**
-         * Initial entrance friction parameter.
-         */
-        private const val INIT_FRICTION = 25
-        /**
-         * Scroll entrance animation tension parameter.
-         */
-        private const val SCROLL_TENSION = 250
-        /**
-         * Scroll entrance animation friction parameter.
-         */
-        private const val SCROLL_FRICTION = 25
-    }
-
     init {
         // Use height of RecyclerView to slide-in items from bottom.
         mStartDelay =
-            INIT_DELAY
+            delay
     }
 }
