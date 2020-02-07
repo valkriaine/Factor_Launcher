@@ -201,31 +201,31 @@ class HomeScreen : AppCompatActivity() {
             viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
 
                 override fun onPageScrollStateChanged(state: Int) {
-                    if (binding.viewPager.currentItem == 0) {
-                        binding.blurFrame.translationZ = -200f
-                        binding.backgroundBlur.disable()
+                    if (viewPager.currentItem == 0) {
+                        blurFrame.translationZ = -200f
+                        backgroundBlur.disable()
                     }
-                    if (binding.viewPager.currentItem == 1) {
-                        binding.backgroundBlur.updateMode = UpdateMode.MANUALLY
+                    if (viewPager.currentItem == 1) {
+                        backgroundBlur.updateMode = UpdateMode.MANUALLY
                     }
                 }
 
                 override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
                     xOffset = (position + positionOffset) / (pagerAdapter.count - 1)
-                    binding.backgroundBlur.enable()
-                    binding.backgroundBlur.updateMode = UpdateMode.ON_SCROLL
-                    binding.dim.alpha = xOffset/1.5f
-                    binding.backgroundBlur.blurRadius = xOffset * 50
+                    backgroundBlur.enable()
+                    backgroundBlur.updateMode = UpdateMode.ON_SCROLL
+                    dim.alpha = xOffset/1.5f
+                    backgroundBlur.blurRadius = xOffset * 70
                     arrowButton.rotation = 180 + 180*xOffset
 
                 }
 
                 override fun onPageSelected(position: Int) {
                     if (position == 0) {
-                        binding.viewPager.setAllowedSwipeDirection(SwipeDirection.Right)
+                        viewPager.setAllowedSwipeDirection(SwipeDirection.Right)
                         arrowButton.rotation = 180f
                     } else {
-                        binding.viewPager.setAllowedSwipeDirection(SwipeDirection.Left)
+                        viewPager.setAllowedSwipeDirection(SwipeDirection.Left)
                         arrowButton.rotation = 0f
                     }
                 }
