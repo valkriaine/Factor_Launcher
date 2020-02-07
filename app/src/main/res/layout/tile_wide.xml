@@ -3,7 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/tilelayout"
+        android:id="@+id/tileLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minWidth="280dp"
@@ -23,35 +23,44 @@
             android:layout_marginLeft="8dp"
             android:layout_marginBottom="8dp">
 
+        <FrameLayout
+                android:id="@+id/color"
+                android:translationZ="-10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
         <eightbitlab.com.blurview.BlurView
                 android:id="@+id/trans"
+                android:translationZ="-20dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:blurOverlayColor="#4FADADAD"/>
 
 
-        <ImageView
-                android:id="@+id/tileicon"
-                android:layout_height="20dp"
-                android:layout_width="20dp"
+        <com.qhutch.elevationimageview.ElevationImageView
+                android:id="@+id/tileIcon"
+                android:layout_height="70dp"
+                android:layout_width="70dp"
                 android:gravity="center"
+                android:padding="10dp"
                 android:scaleType="fitCenter"
+                android:elevation="150dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
         <TextView
-                android:id="@+id/tilelabel"
+                android:id="@+id/tileLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="10dp"
                 app:layout_constraintLeft_toLeftOf="parent"
-                android:layout_marginStart="20dp"/>
+                android:layout_marginStart="15dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

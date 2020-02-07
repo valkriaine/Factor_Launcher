@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView.AdapterContextMenuInfo
+import android.widget.OverScroller
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.DataBindingUtil
@@ -21,6 +22,7 @@ import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.valkriaine.glasslauncher.databinding.ActivityHomeScreenBinding
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.ScaleInBottomAnimator
+import kotlinx.android.synthetic.main.tile.*
 import no.danielzeller.blurbehindlib.UpdateMode
 
 
@@ -100,10 +102,8 @@ class HomeScreen : AppCompatActivity() {
         registerBroadcast()
 
 
-
     }
 
-    //todo: handle app update
     private fun registerBroadcast ()
     {
         registerReceiver(object : BroadcastReceiver() {
@@ -264,12 +264,8 @@ class HomeScreen : AppCompatActivity() {
     private fun setUpTileList()
     {
         binding.apply {
-            tileList.adapter = ScaleInAnimationAdapter(viewModel.recyclerViewAdapter). apply{
-                setDuration(350)
-                setFirstOnly(true)
-            }
+            tileList.adapter = viewModel.recyclerViewAdapter
             registerForContextMenu(tileList)
-
             itemTouchHelper.attachToRecyclerView(tileList)
             tileList.itemAnimator = ScaleInBottomAnimator()
         }

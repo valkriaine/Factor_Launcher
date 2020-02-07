@@ -13,9 +13,7 @@ import android.os.AsyncTask
 import android.util.Base64
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.toBitmap
@@ -23,6 +21,8 @@ import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.qhutch.elevationimageview.ElevationImageView
+import com.valkriaine.glasslauncher.animation.RecyclerViewAnimator
 import eightbitlab.com.blurview.BlurView
 import eightbitlab.com.blurview.RenderScriptBlur
 import java.io.ByteArrayOutputStream
@@ -123,15 +123,18 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
     {
         var onItemClick: ((LiveTile) -> Unit)? = null
         var onItemLongClick : ((LiveTile) -> Unit)? = null
+        private val animator =
+            RecyclerViewAnimator(HomeScreen.binding.tileList)
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         {
             private var size = 1
-            private val icon : ImageView = itemView.findViewById(R.id.tileicon)
-            private val label: TextView = itemView.findViewById(R.id.tilelabel)
+            private val icon : ElevationImageView = itemView.findViewById(R.id.tileIcon)
+            private val label: TextView = itemView.findViewById(R.id.tileLabel)
             private val inner : ConstraintLayout = itemView.findViewById(R.id.inner)
-            private val outer : ConstraintLayout = itemView.findViewById(R.id.tilelayout)
+            private val outer : ConstraintLayout = itemView.findViewById(R.id.tileLayout)
             private val blur : BlurView = itemView.findViewById(R.id.trans)
+            private val color : FrameLayout = itemView.findViewById(R.id.color)
 
             init {
                 itemView.setOnClickListener {
@@ -231,8 +234,12 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                 }
                 blur.setupWith(HomeScreen.binding.blurBackground)
                     .setBlurAlgorithm(RenderScriptBlur(context))
-                    .setBlurRadius(18F)
+                    .setBlurRadius(25F)
                     .setHasFixedTransformationMatrix(false)
+
+                color.setBackgroundColor(liveTile.color)
+                color.alpha = 0.2F
+
             }
 
         }
@@ -255,16 +262,35 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
         }
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
         {
-            return when (viewType) {
-                0 -> ViewHolder(LayoutInflater.from(context).inflate(R.layout.tile, parent, false))
-                1 -> ViewHolder(LayoutInflater.from(context).inflate(R.layout.tile_wide, parent, false))
-                else -> ViewHolder(LayoutInflater.from(context).inflate(R.layout.tile_large, parent, false))
+            val layout : View =  when (viewType) {
+                0 -> {
+                    LayoutInflater.from(context).inflate(R.layout.tile, parent, false)
+                }
+                1 -> {
+                    LayoutInflater.from(context).inflate(R.layout.tile_wide, parent, false)
+                }
+                else -> LayoutInflater.from(context).inflate(R.layout.tile_large, parent, false)
             }
+            animator.onCreateViewHolder(layout)
+            return ViewHolder(layout)
         }
-        //more on this, add widget type
         override fun getItemViewType(position: Int): Int = tiles[position].size
         override fun getItemCount(): Int = tiles.size
-        override fun onBindViewHolder(holder: ViewHolder, position: Int){
+        override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads : MutableList<Any>){
+            animator.onBindViewHolder(holder.itemView, position)
+            if (payloads.isEmpty()) {
+                holder.bindItem((tiles[position]))
+            }
+            else
+            {
+                if (payloads.any{it is NotificationChanged})
+                {
+                    //todo: handle notification change here
+                }
+            }
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.bindItem((tiles[position]))
         }
     }
@@ -377,9 +403,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
     }
 }
 
-
-
-
+class NotificationChanged
 
 open class AppInfo (label : String, icon : Bitmap, packageName : String) : Comparable<AppInfo>
 {
@@ -423,6 +447,7 @@ class LiveTile(label : String, icon : Bitmap, packageName : String) : AppInfo(la
     var size = 0
     var type = TileType.NORMAL
 }
+
 
 
 
