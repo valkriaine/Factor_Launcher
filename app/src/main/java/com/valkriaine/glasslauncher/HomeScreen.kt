@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView.AdapterContextMenuInfo
-import android.widget.OverScroller
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.DataBindingUtil
@@ -20,23 +19,15 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.valkriaine.glasslauncher.databinding.ActivityHomeScreenBinding
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.ScaleInBottomAnimator
-import kotlinx.android.synthetic.main.tile.*
 import no.danielzeller.blurbehindlib.UpdateMode
-
-
-enum class SwipeDirection
-{
-    All, Left, Right, None
-}
-
 
 
 class HomeScreen : AppCompatActivity() {
 
 
     private val key = "APPTILELISTPREFERENCE"
+    private var isFirstLaunchBlur = true
     private val timeUnit : Long = 0.000001.toLong()
     private var xOffset : Float = 0f
     private lateinit var wm : WallpaperManager
@@ -197,12 +188,11 @@ class HomeScreen : AppCompatActivity() {
         pagerAdapter = SectionsPagerAdapter()
         binding.apply {
             viewPager.adapter = pagerAdapter
-            viewPager.setAllowedSwipeDirection(SwipeDirection.Right)
             viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
 
-                override fun onPageScrollStateChanged(state: Int) {
+                override fun onPageScrollStateChanged(state: Int)
+                {
                     if (viewPager.currentItem == 0) {
-                        blurFrame.translationZ = -200f
                         backgroundBlur.disable()
                     }
                     if (viewPager.currentItem == 1) {
@@ -210,24 +200,31 @@ class HomeScreen : AppCompatActivity() {
                     }
                 }
 
-                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                    xOffset = (position + positionOffset) / (pagerAdapter.count - 1)
-                    backgroundBlur.enable()
-                    backgroundBlur.updateMode = UpdateMode.ON_SCROLL
-                    dim.alpha = xOffset/1.5f
-                    backgroundBlur.blurRadius = xOffset * 70
-                    arrowButton.rotation = 180 + 180*xOffset
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int)
+                {
+                    if (isFirstLaunchBlur) {
+                        backgroundBlur.disable()
+                        isFirstLaunchBlur = false
+                    }
+                    else
+                    {
+                        backgroundBlur.enable()
+                        xOffset = (position + positionOffset) / (pagerAdapter.count - 1)
+                        backgroundBlur.updateMode = UpdateMode.ON_SCROLL
+                        dim.alpha = xOffset / 1.5f
+                        backgroundBlur.blurRadius = xOffset * 40
+                        arrowButton.rotation = +180 * xOffset - 180
+                    }
 
                 }
 
-                override fun onPageSelected(position: Int) {
-                    if (position == 0) {
-                        viewPager.setAllowedSwipeDirection(SwipeDirection.Right)
+                override fun onPageSelected(position: Int)
+                {
+                    if (position == 0)
+                    {
                         arrowButton.rotation = 180f
-                    } else {
-                        viewPager.setAllowedSwipeDirection(SwipeDirection.Left)
-                        arrowButton.rotation = 0f
                     }
+
                 }
             })
         }
@@ -322,12 +319,6 @@ class HomeScreen : AppCompatActivity() {
             return container.findViewById(resId)
         }
 
-        override fun getPageTitle(position: Int): CharSequence? {
-            return if (position == 0)
-                "Home"
-            else
-                "Apps"
-        }
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
             return view == `object`
         }
@@ -338,10 +329,12 @@ class HomeScreen : AppCompatActivity() {
 
 }
 
+
+
 class HomePager(context: Context?, attrs: AttributeSet?) : ViewPager(context!!, attrs)
 {
     private var initialXValue = 0f
-    private var direction: SwipeDirection
+    private var diff = 0f
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -357,36 +350,28 @@ class HomePager(context: Context?, attrs: AttributeSet?) : ViewPager(context!!, 
     }
 
     private fun isSwipeAllowed(event: MotionEvent): Boolean {
-        if (direction == SwipeDirection.All) return true
-        if (direction == SwipeDirection.None) //disable any swipe
-            return false
-        if (event.action == MotionEvent.ACTION_DOWN) {
+
+        if (event.action == MotionEvent.ACTION_DOWN)
+        {
             initialXValue = event.x
             return true
         }
-        if (event.action == MotionEvent.ACTION_MOVE) {
-            try {
-                val diffX = event.x - initialXValue
-                if (diffX > 0 && direction == SwipeDirection.Right) { // swipe from left to right detected
+        if (event.action == MotionEvent.ACTION_MOVE)
+        {
+            diff = event.x - initialXValue
+                if (diff > 0 && HomeScreen.binding.viewPager.currentItem == 0)
+                 // swipe from left to right detected
                     return false
-                } else if (diffX < 0 && direction == SwipeDirection.Left) { // swipe from right to left detected
+                else if (diff < 0 && HomeScreen.binding.viewPager.currentItem == 1)
+                // swipe from right to left detected
                     return false
-                }
-            } catch (exception: Exception) {
-                exception.printStackTrace()
-            }
         }
         return true
     }
-
-    fun setAllowedSwipeDirection(direction: SwipeDirection) {
-        this.direction = direction
-    }
-
-    init {
-        direction = SwipeDirection.All
-    }
 }
+
+
+
 
 
 

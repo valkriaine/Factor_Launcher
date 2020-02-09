@@ -129,12 +129,12 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         {
             private var size = 1
-            private val icon : ElevationImageView = itemView.findViewById(R.id.tileIcon)
-            private val label: TextView = itemView.findViewById(R.id.tileLabel)
-            private val inner : ConstraintLayout = itemView.findViewById(R.id.inner)
-            private val outer : ConstraintLayout = itemView.findViewById(R.id.tileLayout)
-            private val blur : BlurView = itemView.findViewById(R.id.trans)
-            private val color : FrameLayout = itemView.findViewById(R.id.color)
+            private val icon : ElevationImageView = itemView.findViewById(R.id.tileIcon) as ElevationImageView
+            private val label: TextView = itemView.findViewById(R.id.tileLabel) as TextView
+            private val inner : ConstraintLayout = itemView.findViewById(R.id.inner) as ConstraintLayout
+            private val outer : ConstraintLayout = itemView.findViewById(R.id.tileLayout) as ConstraintLayout
+            private val blur : BlurView = itemView.findViewById(R.id.trans) as BlurView
+            private val color : FrameLayout = itemView.findViewById(R.id.color) as FrameLayout
 
             init {
                 itemView.setOnClickListener {
@@ -296,8 +296,6 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
     }
     inner class AppsAdapter internal constructor(context: Context, private val resource: Int) : ArrayAdapter<AppsAdapter.ItemHolder>(context, resource)
     {
-
-
         override fun getCount(): Int {
             return apps.size
         }
@@ -309,8 +307,8 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
             if (cv == null) {
                 cv = LayoutInflater.from(context).inflate(resource, null)
                 holder = ItemHolder()
-                holder.name = cv!!.findViewById(R.id.label)
-                holder.icon = cv.findViewById(R.id.icon)
+                holder.name = cv!!.findViewById(R.id.label) as TextView
+                holder.icon = cv.findViewById(R.id.icon) as ImageView
                 cv.tag = holder
             } else {
                 holder = cv.tag as ItemHolder
