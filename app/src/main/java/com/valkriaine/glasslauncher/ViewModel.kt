@@ -234,11 +234,11 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                 }
                 blur.setupWith(HomeScreen.binding.blurBackground)
                     .setBlurAlgorithm(RenderScriptBlur(context))
-                    .setBlurRadius(20F)
+                    .setBlurRadius(18F)
                     .setHasFixedTransformationMatrix(false)
 
                 color.setBackgroundColor(liveTile.color)
-                color.alpha = 0.1F
+                color.alpha = 0.15F
 
             }
 
@@ -262,15 +262,8 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
         }
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
         {
-            val layout : View =  when (viewType) {
-                0 -> {
-                    LayoutInflater.from(context).inflate(R.layout.tile, parent, false)
-                }
-                1 -> {
-                    LayoutInflater.from(context).inflate(R.layout.tile_wide, parent, false)
-                }
-                else -> LayoutInflater.from(context).inflate(R.layout.tile_large, parent, false)
-            }
+            val layout = LayoutInflater.from(context).inflate(R.layout.tile, parent, false)
+
             animator.onCreateViewHolder(layout)
             return ViewHolder(layout)
         }

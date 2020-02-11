@@ -112,9 +112,12 @@ class HomeScreen : AppCompatActivity() {
                         viewModel.notifyAppListDataChange()
                     }
                     Intent.ACTION_PACKAGE_REMOVED -> {
-                        if (!intent.extras?.getBoolean(Intent.EXTRA_REPLACING)!!)
-                        viewModel.apps.removeByPackage(intent.dataString!!.substring(8))
-                        viewModel.tiles.removeByPackageName(intent.dataString!!.substring(8))
+                        if (!intent.extras?.getBoolean(Intent.EXTRA_REPLACING)!!) {
+                            viewModel.apps.removeByPackage(intent.dataString!!.substring(8))
+                            viewModel.tiles.removeByPackageName(intent.dataString!!.substring(8))
+                        }
+                        else
+                            viewModel.apps.removeByPackage(intent.dataString!!.substring(8))
                         viewModel.notifyAppListDataChange()
                     }
 
