@@ -4,7 +4,7 @@ Windows Phone Inspired Launcher, written in Kotlin
 Currently the project is in a really early stage, and a lot of basic features are missing. 
 
 A short demo: 
-https://youtu.be/b1xm3teTd4U 
+https://www.youtube.com/watch?v=TNLCoU4hGYY
 
 
 Todo:
