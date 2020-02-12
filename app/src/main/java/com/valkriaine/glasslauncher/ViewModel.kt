@@ -32,7 +32,7 @@ enum class TileType{
     NORMAL, WIDGET, GALLERY, FOLDER
 }
 
-class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
+class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
 
 
     val tileType = object : TypeToken<ArrayList<LiveTile>>() {}.type!!
@@ -232,14 +232,20 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences) {
                         inner.maxWidth = inner.minWidth
                     }
                 }
-                blur.setupWith(HomeScreen.binding.blurBackground)
-                    .setBlurAlgorithm(RenderScriptBlur(context))
-                    .setBlurRadius(18F)
-                    .setHasFixedTransformationMatrix(false)
 
                 color.setBackgroundColor(liveTile.color)
-                color.alpha = 0.15F
-
+                if (HomeScreen.blurEnabled) {
+                    blur.setupWith(HomeScreen.binding.blurBackground)
+                        .setBlurAlgorithm(RenderScriptBlur(context))
+                        .setBlurRadius(18F)
+                        .setHasFixedTransformationMatrix(false)
+                    color.alpha = 0.15F
+                }
+                else
+                {
+                    blur.setBlurEnabled(false)
+                    color.alpha = 1F
+                }
             }
 
         }

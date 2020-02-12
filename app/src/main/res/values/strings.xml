@@ -4,4 +4,11 @@
     <string name="tab_text_2">Apps</string>
     <string name="go_to_app_drawer">Go to app drawer</string>
     <string name="background_image">Background image</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="wallpaper_hide">use black background</string>
+    <string name="wallpaper_show">show system wallpaper</string>
+    <string name="blur_on">blur effect on tiles and app drawer</string>
+    <string name="blur_off">no blur effect</string>
+    <bool name="show_wallpaper">false</bool>
 </resources>

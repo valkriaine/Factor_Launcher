@@ -4,32 +4,39 @@
           package="com.valkriaine.glasslauncher">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.BIND_APPWIDGET" tools:ignore="ProtectedPermissions" />
+    <uses-permission
+            android:name="android.permission.BIND_APPWIDGET"
+            tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES"/>
 
     <application
             android:allowBackup="true"
+            android:hardwareAccelerated="true"
             android:icon="@mipmap/ic_launcher"
+            android:installLocation="internalOnly"
             android:label="HomeLauncher"
             android:largeHeap="false"
-            android:hardwareAccelerated="true"
+            android:restoreAnyVersion="true"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:stateNotNeeded="true"
             android:supportsRtl="true"
-            android:theme="@style/HomeTheme"
-            android:restoreAnyVersion="true"
-            android:installLocation="internalOnly">
+            android:theme="@style/HomeTheme">
+        <activity
+                android:name=".SettingsActivity"
+                android:label="@string/title_activity_settings">
+        </activity>
         <activity
                 android:name=".HomeScreen"
-                android:launchMode="singleTask"
                 android:clearTaskOnLaunch="true"
-                android:stateNotNeeded="true"
-                android:screenOrientation="portrait"
-                android:theme="@style/HomeTheme"
                 android:enabled="true"
+                android:launchMode="singleTask"
+                android:screenOrientation="portrait"
+                android:stateNotNeeded="true"
+                android:theme="@style/HomeTheme"
                 android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.HOME"/>

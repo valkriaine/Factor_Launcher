@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.WallpaperManager
 import android.appwidget.AppWidgetManager
 import android.content.*
+import android.graphics.Color
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
 import androidx.databinding.DataBindingUtil
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
@@ -23,10 +25,12 @@ import jp.wasabeef.recyclerview.animators.ScaleInBottomAnimator
 import no.danielzeller.blurbehindlib.UpdateMode
 
 
-class HomeScreen : AppCompatActivity() {
+class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     private val key = "APPTILELISTPREFERENCE"
+    private val firstLaunch = "isFirstLaunch"
+    private lateinit var defaultSharedPreferences: SharedPreferences
     private var isFirstLaunchBlur = true
     private val timeUnit : Long = 0.000001.toLong()
     private var xOffset : Float = 0f
@@ -75,24 +79,36 @@ class HomeScreen : AppCompatActivity() {
     {
         lateinit var viewModel : ViewModel
         lateinit var binding : ActivityHomeScreenBinding
+        var isFirstLaunch : Boolean = true
+        var blurEnabled = true
+        var wallpaperEnabled = true
     }
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_home_screen)
+        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
         sharedPreferences = getSharedPreferences(key, Context.MODE_PRIVATE)
-        widgetManager = AppWidgetManager.getInstance(this)
-        viewModel = ViewModel(this, packageManager, sharedPreferences)
+        isFirstLaunch = sharedPreferences.getBoolean(firstLaunch, true)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_home_screen)
 
-        linkComponents()
-        setUpPager()
-        setUpAppList()
-        setUpTileList()
-        hideNavigationBar()
-        registerBroadcast()
+        if (isFirstLaunch)
+        {
+            startActivity(Intent(this, SettingsActivity :: class.java))
+        }
+        else
+        {
+            widgetManager = AppWidgetManager.getInstance(this)
+            viewModel = ViewModel(this, packageManager, sharedPreferences)
 
-
+            linkComponents()
+            setUpPager()
+            setUpAppList()
+            setUpTileList()
+            hideNavigationBar()
+            registerBroadcast()
+        }
     }
 
     private fun registerBroadcast ()
@@ -151,15 +167,25 @@ class HomeScreen : AppCompatActivity() {
     override fun onPause()
     {
         super.onPause()
-        binding.backgroundBlur.disable()
-        unregisterReceiver(broadcastReceiver)
+        if (!isFirstLaunch) {
+            binding.backgroundBlur.disable()
+            unregisterReceiver(broadcastReceiver)
+        }
     }
     override fun onResume()
     {
         super.onResume()
-        binding.backgroundBlur.enable()
-        binding.backgroundBlur.updateForMilliSeconds(timeUnit)
-        registerBroadcast()
+        if (!isFirstLaunch)
+        {
+            if (blurEnabled) {
+                binding.backgroundBlur.enable()
+                binding.backgroundBlur.updateForMilliSeconds(timeUnit)
+            }
+            registerBroadcast()
+        }
+        else
+            startActivity(Intent(this, SettingsActivity :: class.java))
+
     }
     override fun onBackPressed()
     {
@@ -179,11 +205,15 @@ class HomeScreen : AppCompatActivity() {
     }
     private fun linkComponents()
     {
-        this.wm = WallpaperManager.getInstance(applicationContext)
-        binding.apply {
-            image.setImageDrawable(wm.drawable)
-            dim.alpha = 0f
-            backgroundBlur.viewBehind = binding.image
+        if (wallpaperEnabled)
+        {
+            this.wm = WallpaperManager.getInstance(applicationContext)
+            binding.apply {
+                image.setImageDrawable(wm.drawable)
+                dim.alpha = 0f
+                if (blurEnabled)
+                    backgroundBlur.viewBehind = binding.image
+            }
         }
     }
     private fun setUpPager()
@@ -195,11 +225,14 @@ class HomeScreen : AppCompatActivity() {
 
                 override fun onPageScrollStateChanged(state: Int)
                 {
-                    if (viewPager.currentItem == 0) {
-                        backgroundBlur.disable()
-                    }
-                    if (viewPager.currentItem == 1) {
-                        backgroundBlur.updateMode = UpdateMode.MANUALLY
+                    if (blurEnabled)
+                    {
+                        if (viewPager.currentItem == 0) {
+                            backgroundBlur.disable()
+                        }
+                        if (viewPager.currentItem == 1) {
+                            backgroundBlur.updateMode = UpdateMode.MANUALLY
+                        }
                     }
                 }
 
@@ -211,11 +244,14 @@ class HomeScreen : AppCompatActivity() {
                     }
                     else
                     {
-                        backgroundBlur.enable()
                         xOffset = (position + positionOffset) / (pagerAdapter.count - 1)
-                        backgroundBlur.updateMode = UpdateMode.ON_SCROLL
+                        if (blurEnabled)
+                        {
+                            backgroundBlur.enable()
+                            backgroundBlur.updateMode = UpdateMode.ON_SCROLL
+                            backgroundBlur.blurRadius = xOffset * 40
+                        }
                         dim.alpha = xOffset / 1.5f
-                        backgroundBlur.blurRadius = xOffset * 40
                         arrowButton.rotation = +180 * xOffset - 180
                     }
 
@@ -311,6 +347,7 @@ class HomeScreen : AppCompatActivity() {
 
         return super.onContextItemSelected(item)
     }
+
     class SectionsPagerAdapter : PagerAdapter()
     {
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
@@ -330,10 +367,27 @@ class HomeScreen : AppCompatActivity() {
         }
     }
 
+    private fun setBackgroundVisibility(visibility : Boolean)
+    {
+        if (!visibility)
+        {
+            binding.screen.setBackgroundColor(Color.BLACK)
+            wallpaperEnabled = false
+        }
+    }
+
+//todo: more on this. need two separate setting menus
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key.equals("background"))
+            setBackgroundVisibility(sharedPreferences!!.getBoolean("background", false))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        defaultSharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
 }
-
-
-
 class HomePager(context: Context?, attrs: AttributeSet?) : ViewPager(context!!, attrs)
 {
     private var initialXValue = 0f

@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="wallpaper_visibility">
+        <item>black background</item>
+        <item>show wallpaper</item>
+    </string-array>
+</resources>
