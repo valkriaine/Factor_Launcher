@@ -18,6 +18,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+
+    <GridLayout android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:translationZ="-30dp"
+                android:background="#000000"
+                android:visibility="gone"/>
+
 <!--view group hosting the entire screen, will be blurred-->
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mainScreen"

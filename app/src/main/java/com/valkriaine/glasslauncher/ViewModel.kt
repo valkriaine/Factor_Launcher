@@ -234,18 +234,11 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
                 }
 
                 color.setBackgroundColor(liveTile.color)
-                if (HomeScreen.blurEnabled) {
                     blur.setupWith(HomeScreen.binding.blurBackground)
                         .setBlurAlgorithm(RenderScriptBlur(context))
                         .setBlurRadius(18F)
                         .setHasFixedTransformationMatrix(false)
                     color.alpha = 0.15F
-                }
-                else
-                {
-                    blur.setBlurEnabled(false)
-                    color.alpha = 1F
-                }
             }
 
         }
