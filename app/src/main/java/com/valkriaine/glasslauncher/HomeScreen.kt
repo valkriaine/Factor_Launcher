@@ -108,6 +108,9 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
             setUpTileList()
             hideNavigationBar()
             registerBroadcast()
+
+
+
         }
     }
 
@@ -307,6 +310,7 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
         viewModel.recyclerViewAdapter.onItemClick = { liveTile -> startActivity(packageManager.getLaunchIntentForPackage(liveTile.name!!)) }
         viewModel.recyclerViewAdapter.onItemLongClick = {
         }
+
 
 
     }

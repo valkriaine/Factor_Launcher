@@ -20,7 +20,8 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:stateNotNeeded="true"
             android:supportsRtl="true"
-            android:theme="@style/HomeTheme">
+            android:theme="@style/HomeTheme"
+            tools:replace="android:label">
         <activity
                 android:name=".SettingsActivity"
                 android:label="@string/title_activity_settings">
