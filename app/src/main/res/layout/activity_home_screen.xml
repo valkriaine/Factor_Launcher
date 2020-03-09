@@ -74,6 +74,7 @@
             app:useTextureView="true"
             app:blurTextureScale="0.5"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.valkriaine.glasslauncher.HomePager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
@@ -85,7 +86,7 @@
             android:overScrollMode="never">
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/liveTileHost">
@@ -95,54 +96,50 @@
                     android:onClick="switchpage"
                     android:hapticFeedbackEnabled="true"
                     android:src="@drawable/arrow"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:foregroundGravity="left"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginTop="130dp"
+                    android:layout_marginStart="20dp"
                     android:layout_marginEnd="30dp"
                     android:background="@drawable/circle"
                     android:scaleType="center"
                     android:rotation="180"
+                    android:layout_alignParentRight="true"
                     android:contentDescription="@string/go_to_app_drawer"/>
 
 
 
-
-            <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/arrowButton"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="25dp">
-
                 <com.ever777.bouncingscroll.BouncingNestedScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:id="@+id/scroller"
+                        android:layout_width="860dp"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_toLeftOf="@id/arrowButton">
 
-                <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/tileList"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="120dp"
-                        android:paddingBottom="200dp"
-                        android:clipToPadding="false"
-                />
+
+                    <com.google.android.flexbox.FlexboxLayout
+                            android:id="@+id/tileHost"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingTop="120dp"
+                            android:paddingBottom="200dp"
+                            android:clipToPadding="false"
+                            app:flexWrap="wrap"
+                            app:justifyContent="flex_end"
+                            app:alignContent="flex_start"/>
+
 
                 </com.ever777.bouncingscroll.BouncingNestedScrollView>
 
-            </LinearLayout>
 
 
 
 
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
 
 
         <androidx.constraintlayout.widget.ConstraintLayout

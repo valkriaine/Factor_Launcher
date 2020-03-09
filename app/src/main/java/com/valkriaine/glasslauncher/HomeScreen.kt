@@ -7,11 +7,14 @@ import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView.AdapterContextMenuInfo
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.marginStart
 import androidx.databinding.DataBindingUtil
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -19,10 +22,12 @@ import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.AlignSelf
+import com.google.android.flexbox.FlexboxLayout
 import com.valkriaine.glasslauncher.databinding.ActivityHomeScreenBinding
-import jp.wasabeef.recyclerview.animators.ScaleInBottomAnimator
 import no.danielzeller.blurbehindlib.UpdateMode
+import kotlin.math.roundToInt
 
 
 class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -102,6 +107,7 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
             widgetManager = AppWidgetManager.getInstance(this)
             viewModel = ViewModel(this, packageManager, sharedPreferences)
 
+
             linkComponents()
             setUpPager()
             setUpAppList()
@@ -111,6 +117,26 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
 
 
 
+
+
+            for (i in 0..11)
+            {
+                val myButton = Button(this)
+                myButton.width = 427
+                myButton.height = 427
+
+                if (i == 4)
+                    myButton.width = 860
+
+                if (i == 9) {
+                    myButton.width = 860
+                    myButton.height = 860
+                }
+
+
+
+                binding.tileHost.addView(myButton)
+            }
         }
     }
 
@@ -292,6 +318,7 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
     }
     private fun setUpTileList()
     {
+        /*
         binding.apply {
             tileList.adapter = viewModel.recyclerViewAdapter
             registerForContextMenu(tileList)
@@ -312,7 +339,7 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
         }
 
 
-
+        */
     }
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val info = item.menuInfo as AdapterContextMenuInfo
@@ -322,7 +349,7 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
             R.id.addToStart ->
             {
                 binding.viewPager.setCurrentItem(0, true)
-                binding.tileList.scrollToPosition(viewModel.tiles.size - 1)
+                //binding.tileList.scrollToPosition(viewModel.tiles.size - 1)
                 viewModel.addToTiles(pos)
             }
             R.id.uninstall ->

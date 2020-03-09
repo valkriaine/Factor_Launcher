@@ -118,13 +118,13 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
     }
 
 
-
+//todo: don't need the RecyclerViewAdapter anymore, create simply an array of pinned tiles and load them into tileHost
+//todo: also need to create a new view for live tiles
     inner class RecyclerViewAdapter (private val context: Context) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>()
     {
         var onItemClick: ((LiveTile) -> Unit)? = null
         var onItemLongClick : ((LiveTile) -> Unit)? = null
-        private val animator =
-            RecyclerViewAnimator(HomeScreen.binding.tileList)
+        //private val animator = RecyclerViewAnimator(HomeScreen.binding.tileList)
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         {
@@ -199,7 +199,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
                 size = liveTile!!.size
                 icon.setImageBitmap(getBitmapFromString(liveTile.icon!!))
                 label.text = liveTile.rename
-
+/*
                 when (liveTile.size) {
                     0 -> {
                         outer.minWidth = HomeScreen.binding.tileList.width / 2
@@ -232,7 +232,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
                         inner.maxWidth = inner.minWidth
                     }
                 }
-
+*/
                 color.setBackgroundColor(liveTile.color)
                     blur.setupWith(HomeScreen.binding.blurBackground)
                         .setBlurAlgorithm(RenderScriptBlur(context))
@@ -263,13 +263,13 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
         {
             val layout = LayoutInflater.from(context).inflate(R.layout.tile, parent, false)
 
-            animator.onCreateViewHolder(layout)
+            //animator.onCreateViewHolder(layout)
             return ViewHolder(layout)
         }
         override fun getItemViewType(position: Int): Int = tiles[position].size
         override fun getItemCount(): Int = tiles.size
         override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads : MutableList<Any>){
-            animator.onBindViewHolder(holder.itemView, position)
+            //animator.onBindViewHolder(holder.itemView, position)
             if (payloads.isEmpty()) {
                 holder.bindItem((tiles[position]))
             }
