@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.qhutch.elevationimageview:elevationimageview:2.4'
     implementation 'bg.devlabs.transitioner:transitioner:1.3'
     implementation 'com.github.EverK777:BounceScrollBehaviour:1.0.7'
+    implementation 'com.google.android:flexbox:2.0.1'
     def dynamicAnimation_Version = "1.0.0"
     implementation "androidx.dynamicanimation:dynamicanimation:$dynamicAnimation_Version"
     implementation 'com.google.code.gson:gson:2.8.6'
