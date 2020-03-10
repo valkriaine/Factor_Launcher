@@ -110,13 +110,18 @@
 
 
 
-                <com.ever777.bouncingscroll.BouncingNestedScrollView
+                <com.valkriaine.glasslauncher.animation.BounceScrollView
                         android:id="@+id/scroller"
                         android:layout_width="860dp"
                         android:layout_height="match_parent"
                         android:layout_alignParentStart="true"
                         android:layout_marginStart="10dp"
-                        android:layout_toLeftOf="@id/arrowButton">
+                        android:layout_toLeftOf="@id/arrowButton"
+                        android:overScrollMode="always"
+                        android:scrollbars="none"
+                        app:damping="1.5"
+                        app:nestedScrollingEnabled="false"
+                        app:bounceDelay="400">
 
 
                     <com.google.android.flexbox.FlexboxLayout
@@ -131,9 +136,9 @@
                             app:alignContent="flex_start"/>
 
 
-                </com.ever777.bouncingscroll.BouncingNestedScrollView>
 
 
+                </com.valkriaine.glasslauncher.animation.BounceScrollView>
 
 
 
