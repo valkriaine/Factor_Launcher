@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.qhutch.elevationimageview.ElevationImageView
-import com.valkriaine.glasslauncher.animation.RecyclerViewAnimator
 import eightbitlab.com.blurview.BlurView
 import eightbitlab.com.blurview.RenderScriptBlur
 import java.io.ByteArrayOutputStream
@@ -360,6 +359,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
             } catch (ex: Exception) {
                 Log.e("Error loadApps", ex.message.toString() + " loadApps")
             }
+            Log.d("please", appsAdapter.count.toString())
             return allApps.size
         }
 

@@ -26,6 +26,7 @@ import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.AlignSelf
 import com.google.android.flexbox.FlexboxLayout
 import com.valkriaine.glasslauncher.databinding.ActivityHomeScreenBinding
+import kotlinx.android.synthetic.main.activity_home_screen.*
 import no.danielzeller.blurbehindlib.UpdateMode
 import kotlin.math.roundToInt
 

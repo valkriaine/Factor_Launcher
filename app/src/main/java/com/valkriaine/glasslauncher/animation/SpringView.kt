@@ -9,6 +9,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.dynamicanimation.animation.FloatPropertyCompat
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.EdgeEffectFactory.DIRECTION_BOTTOM
 import androidx.recyclerview.widget.RecyclerView.EdgeEffectFactory.DIRECTION_TOP
 import java.lang.reflect.Field
@@ -48,12 +49,10 @@ internal object OverScroll {
         if (amount.compareTo(0f) == 0) return 0
         var f = amount / max
         f = f / abs(f) * overScrollInfluenceCurve(abs(f))
-
-        // Clamp this factor, f, to -1 < f < 1
         if (abs(f) >= 1) {
             f /= abs(f)
         }
-        return (OVERSCROLL_DAMP_FACTOR * f * max * 6).roundToInt()
+        return (OVERSCROLL_DAMP_FACTOR * f * max * 8).roundToInt()
     }
 }
 
@@ -115,9 +114,8 @@ class SpringEdgeEffect(
     private val reverseAbsorb: Boolean) : EdgeEffect(context)
 {
 
-
     private val spring = SpringAnimation(this, KFloatPropertyCompat(target, "value"), 0f).apply {
-        spring = SpringForce(0f).setStiffness(250f).setDampingRatio(0.8f)
+        spring = SpringForce(0f).setStiffness(500f).setDampingRatio(0.8f)
     }
     private var distance = 0f
 
@@ -133,7 +131,7 @@ class SpringEdgeEffect(
 
     override fun onPull(deltaDistance: Float, displacement: Float) {
         activeEdge.set(this)
-        distance += deltaDistance * (velocityMultiplier * 5)
+        distance += deltaDistance * velocityMultiplier
         target.set(OverScroll.dampedScroll(distance * getMax(), getMax()).toFloat())
     }
 
@@ -185,6 +183,8 @@ class SpringEdgeEffect(
             return result
         }
 
+        fun createFactory() = SpringEdgeEffectFactory()
+
         fun createEdgeEffect(direction: Int, reverseAbsorb: Boolean = false): EdgeEffect? {
             return when (direction) {
                 DIRECTION_TOP -> SpringEdgeEffect(view.context, view::getHeight, ::shiftY, ::activeEdgeY, 0.4f, reverseAbsorb)
@@ -192,5 +192,13 @@ class SpringEdgeEffect(
                 else -> null
             }
         }
+
+        inner class SpringEdgeEffectFactory : RecyclerView.EdgeEffectFactory() {
+
+            override fun createEdgeEffect(recyclerView: RecyclerView, direction: Int): EdgeEffect {
+                return createEdgeEffect(direction) ?: super.createEdgeEffect(recyclerView, direction)
+            }
+        }
+
     }
 }

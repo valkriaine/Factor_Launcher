@@ -123,7 +123,7 @@
                             android:id="@+id/tileHost"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:paddingTop="120dp"
+                            android:paddingTop="114dp"
                             android:paddingBottom="120dp"
                             android:clipToPadding="false"
                             app:flexWrap="wrap"
@@ -161,7 +161,12 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     android:queryHint="Search"/>
 
-            <GridView
+            <com.valkriaine.glasslauncher.animation.SpringScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    >
+
+            <com.valkriaine.glasslauncher.ExpandableGridView
                     android:id="@+id/list"
                     android:paddingTop="112dp"
                     android:paddingBottom="120dp"
@@ -169,7 +174,9 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="wrap_content"/>
+
+            </com.valkriaine.glasslauncher.animation.SpringScrollView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
