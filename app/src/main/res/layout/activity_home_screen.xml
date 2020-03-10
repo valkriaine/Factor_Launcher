@@ -110,18 +110,13 @@
 
 
 
-                <com.valkriaine.glasslauncher.animation.BounceScrollView
+                <com.valkriaine.glasslauncher.animation.SpringScrollView
                         android:id="@+id/scroller"
                         android:layout_width="860dp"
                         android:layout_height="match_parent"
                         android:layout_alignParentStart="true"
                         android:layout_marginStart="10dp"
-                        android:layout_toLeftOf="@id/arrowButton"
-                        android:overScrollMode="always"
-                        android:scrollbars="none"
-                        app:damping="1.5"
-                        app:nestedScrollingEnabled="false"
-                        app:bounceDelay="400">
+                        android:layout_toLeftOf="@id/arrowButton">
 
 
                     <com.google.android.flexbox.FlexboxLayout
@@ -129,7 +124,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:paddingTop="120dp"
-                            android:paddingBottom="200dp"
+                            android:paddingBottom="120dp"
                             android:clipToPadding="false"
                             app:flexWrap="wrap"
                             app:justifyContent="flex_end"
@@ -138,7 +133,7 @@
 
 
 
-                </com.valkriaine.glasslauncher.animation.BounceScrollView>
+                </com.valkriaine.glasslauncher.animation.SpringScrollView>
 
 
 
