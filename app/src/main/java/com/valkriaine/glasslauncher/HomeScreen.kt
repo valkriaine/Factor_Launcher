@@ -120,26 +120,10 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
 
 
 
-            for (i in 0..11)
-            {
-                val myButton = Button(this)
-                myButton.width = 427
-                myButton.height = 427
 
-                if (i == 4)
-                    myButton.width = 860
-
-                if (i == 9) {
-                    myButton.width = 860
-                    myButton.height = 860
-                }
-
-
-
-                binding.tileHost.addView(myButton)
-            }
         }
     }
+
 
     private fun registerBroadcast ()
     {
@@ -350,7 +334,6 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
             R.id.addToStart ->
             {
                 binding.viewPager.setCurrentItem(0, true)
-                //binding.tileList.scrollToPosition(viewModel.tiles.size - 1)
                 viewModel.addToTiles(pos)
             }
             R.id.uninstall ->
@@ -363,7 +346,8 @@ class HomeScreen : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChan
             }
             R.id.removeFromStart ->
             {
-                viewModel.removeFromTiles(pos)
+                val button = findViewById<Button>(pos)
+                viewModel.removeFromTiles(pos, button)
             }
         }
 

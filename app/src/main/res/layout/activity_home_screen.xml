@@ -127,7 +127,7 @@
                             android:paddingBottom="120dp"
                             android:clipToPadding="false"
                             app:flexWrap="wrap"
-                            app:justifyContent="flex_end"
+                            app:justifyContent="flex_start"
                             app:alignContent="flex_start"/>
 
 

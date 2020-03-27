@@ -19,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.qhutch.elevationimageview.ElevationImageView
@@ -38,6 +39,7 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
     val appType = object : TypeToken<ArrayList<AppInfo>>() {}.type!!
     private val appKey = "APPLICATIONLIST"
     private val tileKey = "LIVETILELIST"
+    private val context = context
     var allApps = ArrayList<AppInfo>()
     private val sharedPreferences = s
     private val editor = sharedPreferences.edit()
@@ -86,16 +88,29 @@ class ViewModel (context: Context, pm : PackageManager, s: SharedPreferences){
 
     fun addToTiles(position: Int)
     {
-        recyclerViewAdapter.add(apps[position].toTile())
+        val myButton = Button(context)
+        myButton.id = position
+        myButton.width = 427
+        myButton.height = 427
+        myButton.text = "button$position"
+        HomeScreen.binding.tileHost.addView(myButton)
+        val p = myButton.layoutParams as FlexboxLayout.LayoutParams
+        p.order = position
+        myButton.layoutParams = p
+
+        tiles.add(apps[position].toTile(position))
         tilesSaver = SaveTiles()
         tilesSaver.execute()
     }
-    fun removeFromTiles(position: Int)
+
+    //todo: fix crash when removing a tile with invalid id
+    fun removeFromTiles(position: Int, button: Button)
     {
         for (tile in tiles)
         {
             if (tile.name == apps[position].name) {
-                recyclerViewAdapter.remove(tile)
+                HomeScreen.binding.tileHost.removeView(button)
+                tiles.remove(tile)
                 break
             }
         }
@@ -422,9 +437,9 @@ open class AppInfo (label : String, icon : Bitmap, packageName : String) : Compa
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
     }
 
-    fun toTile() : LiveTile
+    fun toTile(id : Int) : LiveTile
     {
-        return LiveTile(label!!,getBitmapFromString(this.icon!!)!!,name!!)
+        return LiveTile(label!!,getBitmapFromString(this.icon!!)!!,name!!, id)
     }
 
     init {
@@ -432,10 +447,11 @@ open class AppInfo (label : String, icon : Bitmap, packageName : String) : Compa
     }
     override fun compareTo(other: AppInfo): Int = this.rename.toString().compareTo(other.rename.toString())
 }
-class LiveTile(label : String, icon : Bitmap, packageName : String) : AppInfo(label, icon, packageName)
+class LiveTile(label : String, icon : Bitmap, packageName : String, id : Int) : AppInfo(label, icon, packageName)
 {
     var size = 0
     var type = TileType.NORMAL
+    var id = id
 }
 
 
