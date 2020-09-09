@@ -4,20 +4,12 @@ Windows Phone Inspired Launcher, written in Kotlin
 Currently the project is in a really early stage, and a lot of basic features are missing. 
 
 A short demo: 
+updated:
 https://www.youtube.com/watch?v=TNLCoU4hGYY
+first build:
+https://www.youtube.com/watch?v=b1xm3teTd4U
 
-Note**
-Overhauled the home screen completely. Replaced the old RecyclerView home screen with Google's FlexBox Layout and populate it with actual views. This will make it easier to update live tiles and support animations, but due to the overhaul, I need more time to re-add the features that I already implemented with RecyclerView, and I will update the apk release once it's done.
+Commits to this repo are currently paused, as the project is being developed somewhere else. 
+Current features are being redesigned and new features are being added.
+The new goal of this project is to create a marketplace beyond the basic features, where anyone can design and publish their own tiles.
 
-
-
-Todo:
-
-1. properly design live tiles
-2. Enable search
-3. Enable live tiles hosting Android widgets
-4. Settings
-5. Launch app animation
-6. Optimize for speed
-7. App list guesture
-8. Homescreen gesture
